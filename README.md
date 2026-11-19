@@ -56,7 +56,11 @@ docs/            cahier des charges et plan de lancement
 | M2 | Juice, contenu, défi du jour, partage, EN/FR, stubs pub/analytics | à faire |
 | M3 | Builds web + Android | à faire |
 
+## Personnalisation
+
+Bouton 🎨 en haut : choix de l'animal (escargot animé, chenille, tortue, coccinelle, hérisson, lapin, poussin — débloqués en avançant dans la campagne) et de la couleur des feuilles.
+
 ## Astuces de test
 
-- `?level=95` ouvre directement le niveau 95, `?all=1` débloque tous les niveaux.
+- `?level=95` ouvre directement le niveau 95, `?all=1` débloque tous les niveaux et tous les animaux.
 - `?mode=daily` ouvre le défi du jour (avant le 1er décembre 2026 : aperçu du premier défi).

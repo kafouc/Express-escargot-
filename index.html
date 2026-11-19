@@ -11,7 +11,10 @@
   <body>
     <main class="app">
       <header class="top">
-        <h1>🐌 Escargot Express</h1>
+        <div class="brand">
+          <h1>🐌 Escargot Express</h1>
+          <button id="settings-open" class="icon small" aria-label="Personnaliser">🎨</button>
+        </div>
         <div class="tabs" role="tablist">
           <button id="tab-campaign" class="tab active" role="tab" aria-selected="true">Campagne</button>
           <button id="tab-daily" class="tab" role="tab" aria-selected="false">Défi du jour</button>
@@ -52,6 +55,20 @@
         <button id="hint" class="secondary">💡 Indice</button>
       </section>
     </main>
+
+    <div id="settings" class="sheet-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <div class="sheet">
+        <div class="sheet-head">
+          <h2 id="settings-title">Personnaliser</h2>
+          <button id="settings-close" class="icon small" aria-label="Fermer">✕</button>
+        </div>
+        <canvas id="preview" class="preview" aria-hidden="true"></canvas>
+        <h3>Ton animal</h3>
+        <div id="character-list" class="choices"></div>
+        <h3>Couleur des feuilles</h3>
+        <div id="leaf-list" class="swatches"></div>
+      </div>
+    </div>
     <script type="module" src="./src/game/main.ts"></script>
   </body>
 </html>

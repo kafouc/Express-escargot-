@@ -24,7 +24,7 @@ Ce build existe **uniquement** pour tester cette hypothèse sur le web (portails
 
 - Comptes utilisateurs, connexion, backend, base de données, sauvegarde cloud
 - Classement en ligne, multijoueur, amis
-- Boutique, cosmétiques, monnaie virtuelle, vrais achats intégrés
+- Boutique, monnaie virtuelle, vrais achats intégrés (les animaux et couleurs du §4 bis se débloquent en jouant, sans achat)
 - Vrais SDK publicitaires ou analytics (interfaces + stubs uniquement, cf. §7–8)
 - Build iOS
 - Éditeur de niveaux dans le jeu
@@ -79,6 +79,13 @@ Ce build existe **uniquement** pour tester cette hypothèse sur le web (portails
 6. **Victoire** : un reflet lumineux parcourt toute la traînée du début à la fin en 0,8 s, puis pluie de petites feuilles, escargot content, puis écran de résultat.
 
 Direction artistique : couleurs douces (vert sauge, crème, touches corail), formes rondes, gros caractères lisibles, rien d'enfantin. Formes vectorielles dessinées en Canvas/SVG par défaut (voir §12).
+
+## 4 bis. Personnalisation (ajout du 19/11/2026)
+
+- **Animaux** (débloqués par la progression en campagne) : Escargot (dessiné en vectoriel, niv. 1), Chenille (10), Tortue (25), Coccinelle (50), Hérisson (80), Lapin (120), Poussin (160). Chaque animal a sa façon de bouger (glisser, se dandiner, sautiller) et sa traînée.
+- **Couleur des feuilles** : 7 teintes (vert, corail, bleu, violet, or, rose, nuit), libres dès le départ.
+- Choix sauvegardés localement ; menu 🎨 avec aperçu animé.
+- Piste de monétisation future : animaux supplémentaires en achat intégré ou débloqués par une pub récompensée.
 
 ## 5. Pipeline de contenu (À CONSTRUIRE EN PREMIER, outil séparé)
 

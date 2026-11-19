@@ -11,9 +11,13 @@ export interface SaveData {
   best: Record<string, number>;
   /** Dates (AAAA-MM-JJ) des défis du jour réussis. */
   dailyDone: string[];
+  /** Personnage choisi (cf. characters.ts). */
+  character: string;
+  /** Couleur des feuilles choisie (cf. characters.ts). */
+  leafColor: string;
 }
 
-const DEFAULT: SaveData = { unlocked: 1, current: 1, best: {}, dailyDone: [] };
+const DEFAULT: SaveData = { unlocked: 1, current: 1, best: {}, dailyDone: [], character: 'escargot', leafColor: 'vert' };
 
 export function load(): SaveData {
   try {

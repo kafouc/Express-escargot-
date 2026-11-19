@@ -2,7 +2,8 @@
 import type { Level } from '../core/types.ts';
 import { cellRC } from '../core/grid.ts';
 import { applyHint, blockReason, createGame, head, isWon, moveTo, nextWaypoint, progress, reset, truncateAt, type Game } from './rules.ts';
-import { cellAt, computeLayout, render, type Layout, type RenderState } from './render.ts';
+import { cellAt, computeLayout, createRenderState, render, resetMotion, type Layout } from './render.ts';
+import { CHARACTERS, LEAF_COLORS, characterById, isUnlocked, leafColorById } from './characters.ts';
 import { load, save } from './storage.ts';
 
 type Mode = 'campaign' | 'daily';
@@ -26,6 +27,12 @@ const ui = {
   winTitle: $('win-title'),
   winText: $('win-text'),
   winNext: $<HTMLButtonElement>('win-next'),
+  settingsOpen: $<HTMLButtonElement>('settings-open'),
+  settings: $('settings'),
+  settingsClose: $<HTMLButtonElement>('settings-close'),
+  characterList: $('character-list'),
+  leafList: $('leaf-list'),
+  previewCanvas: $<HTMLCanvasElement>('preview'),
 };
 
 const params = new URLSearchParams(location.search);
@@ -40,7 +47,7 @@ let index = 0;
 let dailyDate = '';
 let game: Game;
 let layout: Layout;
-const renderState: RenderState = { shakeAt: -1e9, facing: 1, winAt: 0 };
+const renderState = createRenderState(characterById(saveData.character), leafColorById(saveData.leafColor));
 let startedAt = 0;
 let finishedSeconds: number | null = null;
 let hintsUsed = 0;
@@ -80,8 +87,7 @@ function startLevel(level: Level): void {
   startedAt = 0;
   finishedSeconds = null;
   hintsUsed = 0;
-  renderState.winAt = 0;
-  renderState.facing = 1;
+  resetMotion(renderState);
   ui.win.classList.add('hidden');
   resize();
   updateUi();
@@ -183,10 +189,7 @@ function step(cell: number): boolean {
   }
   if (result === 'ignored') return false;
   if (result === 'started' && startedAt === 0) startedAt = performance.now();
-  if (result === 'extended' && before !== undefined) {
-    const [, c0] = cellRC(game.puzzle.size, before);
-    const [, c1] = cellRC(game.puzzle.size, cell);
-    if (c1 !== c0) renderState.facing = c1 > c0 ? 1 : -1;
+  if (result === 'extended') {
     const w = game.puzzle.waypointAt[cell] ?? 0;
     navigator.vibrate?.(w !== 0 ? 15 : 5);
   }
@@ -258,7 +261,7 @@ ui.reset.addEventListener('click', () => {
   reset(game);
   startedAt = 0;
   finishedSeconds = null;
-  renderState.winAt = 0;
+  resetMotion(renderState);
   ui.win.classList.add('hidden');
   setMessage('');
   updateUi();
@@ -283,6 +286,89 @@ ui.winNext.addEventListener('click', () => {
   else openCampaignLevel(index < campaign.length - 1 ? index + 1 : index);
 });
 
+// ---------- Personnalisation (animal, couleur des feuilles) ----------
+
+const isCharacterUnlocked = (id: string) => unlockAll || isUnlocked(characterById(id), saveData.unlocked);
+
+function buildSettings(): void {
+  ui.characterList.replaceChildren(
+    ...CHARACTERS.map((character) => {
+      const button = document.createElement('button');
+      const unlocked = isCharacterUnlocked(character.id);
+      button.className = 'choice';
+      button.dataset.id = character.id;
+      button.disabled = !unlocked;
+      button.setAttribute('aria-pressed', String(character.id === renderState.character.id));
+      button.innerHTML = `<span class="emoji">${unlocked ? character.emoji : '🔒'}</span><span class="name">${character.name}</span>` +
+        `<span class="sub">${unlocked ? character.trailName : `niveau ${character.unlockLevel}`}</span>`;
+      button.addEventListener('click', () => {
+        renderState.character = character;
+        saveData.character = character.id;
+        save(saveData);
+        buildSettings();
+      });
+      return button;
+    }),
+  );
+  ui.leafList.replaceChildren(
+    ...LEAF_COLORS.map((leaf) => {
+      const button = document.createElement('button');
+      button.className = 'swatch';
+      button.style.setProperty('--swatch', leaf.fill);
+      button.title = leaf.name;
+      button.setAttribute('aria-label', `Feuilles ${leaf.name}`);
+      button.setAttribute('aria-pressed', String(leaf.id === renderState.leaf.id));
+      button.addEventListener('click', () => {
+        renderState.leaf = leaf;
+        saveData.leafColor = leaf.id;
+        save(saveData);
+        buildSettings();
+      });
+      return button;
+    }),
+  );
+}
+
+ui.settingsOpen.addEventListener('click', () => {
+  buildSettings();
+  ui.settings.classList.remove('hidden');
+});
+ui.settingsClose.addEventListener('click', () => ui.settings.classList.add('hidden'));
+ui.settings.addEventListener('click', (event) => {
+  if (event.target === ui.settings) ui.settings.classList.add('hidden');
+});
+
+// Aperçu animé du personnage choisi dans le menu.
+const previewCtx = ui.previewCanvas.getContext('2d') as CanvasRenderingContext2D;
+const previewGame = createGame({
+  id: 'apercu', size: 3, difficulty: 1, seed: 0, walls: [],
+  waypoints: [{ n: 1, r: 1, c: 0 }, { n: 2, r: 1, c: 2 }],
+  solution: [[1, 0], [0, 0], [0, 1], [0, 2], [1, 2], [2, 2], [2, 1], [1, 1], [2, 0]],
+});
+const previewState = createRenderState(renderState.character, renderState.leaf);
+let previewStep = 0;
+
+function renderPreview(now: number): void {
+  if (ui.settings.classList.contains('hidden')) return;
+  const size = 3;
+  const css = ui.previewCanvas.clientWidth || 180;
+  const dpr = Math.min(window.devicePixelRatio || 1, 3);
+  if (ui.previewCanvas.width !== Math.round(css * dpr)) {
+    ui.previewCanvas.width = Math.round(css * dpr);
+    ui.previewCanvas.height = Math.round(css * dpr);
+  }
+  previewCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  previewState.character = renderState.character;
+  previewState.leaf = renderState.leaf;
+  // Promenade en boucle sur un petit chemin : une case toutes les 450 ms.
+  const wanted = Math.floor(now / 450) % 8;
+  if (wanted !== previewStep) {
+    previewStep = wanted;
+    previewGame.path = [3, 0, 1, 2, 5, 8, 7, 4].slice(0, wanted + 2);
+  }
+  render(previewCtx, previewGame, computeLayout(css, size), previewState, now);
+}
+
 // ---------- Affichage ----------
 
 function resize(): void {
@@ -305,6 +391,7 @@ function frame(now: number): void {
     const seconds = finishedSeconds ?? (startedAt ? (now - startedAt) / 1000 : 0);
     ui.timer.textContent = `⏱ ${formatTime(seconds)}`;
   }
+  renderPreview(now);
   requestAnimationFrame(frame);
 }
 

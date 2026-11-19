@@ -37,8 +37,21 @@ body {
 
 h1 {
   font-size: 1.35rem;
+  margin: 0;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
   margin: 4px 0 10px;
-  text-align: center;
+}
+
+.icon.small {
+  width: 40px;
+  height: 40px;
+  font-size: 1.15rem;
 }
 
 .tabs {
@@ -209,4 +222,113 @@ canvas {
     opacity: 0;
     transform: scale(0.97);
   }
+}
+
+/* ---------- Menu de personnalisation ---------- */
+
+.sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgb(40 35 25 / 0.35);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 10;
+  animation: fade 200ms ease-out;
+}
+
+.sheet-backdrop.hidden {
+  display: none;
+}
+
+.sheet {
+  width: 100%;
+  max-width: 480px;
+  max-height: 90%;
+  overflow-y: auto;
+  background: var(--bg);
+  border-radius: 24px 24px 0 0;
+  padding: 18px 18px max(22px, env(safe-area-inset-bottom));
+  box-shadow: 0 -8px 30px rgb(0 0 0 / 0.15);
+}
+
+.sheet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sheet h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.sheet h3 {
+  margin: 16px 0 8px;
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+.preview {
+  display: block;
+  width: 170px;
+  height: 170px;
+  margin: 10px auto 0;
+}
+
+.choices {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 8px;
+}
+
+.choice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 10px 6px;
+  border-radius: 14px;
+  border: 2px solid transparent;
+  background: var(--card);
+  color: var(--ink);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.06);
+}
+
+.choice[aria-pressed='true'] {
+  border-color: var(--leaf);
+}
+
+.choice .emoji {
+  font-size: 1.8rem;
+}
+
+.choice .name {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.choice .sub {
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+
+.swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.swatch {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 3px solid var(--card);
+  background: var(--swatch);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.15);
+}
+
+.swatch[aria-pressed='true'] {
+  outline: 3px solid var(--ink);
+  outline-offset: 1px;
 }
