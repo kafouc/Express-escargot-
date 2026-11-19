@@ -2,6 +2,11 @@
   "name": "Escargot Express",
   "image": "mcr.microsoft.com/devcontainers/javascript-node:22",
   "postCreateCommand": "npm install",
+  "forwardPorts": [5173, 4173],
+  "portsAttributes": {
+    "5173": { "label": "Jeu (npm run dev)", "onAutoForward": "openBrowser" },
+    "4173": { "label": "Jeu compilé (npm run preview)", "onAutoForward": "openBrowser" }
+  },
   "customizations": {
     "vscode": {
       "extensions": ["vitest.explorer"]

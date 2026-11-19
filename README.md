@@ -11,12 +11,16 @@ Puzzle de chemin quotidien : guide un escargot à travers le jardin, passe par l
 
 ### Avec GitHub Codespaces
 
-Bouton **Code → Codespaces → Create codespace**. Node 22 et les dépendances s'installent automatiquement (`.devcontainer/`), il ne reste qu'à lancer les commandes ci-dessous dans le terminal.
+Bouton **Code → Codespaces → Create codespace**. Node 22 et les dépendances s'installent automatiquement (`.devcontainer/`).
+
+Pour **jouer** : `npm run dev` dans le terminal, puis ouvre le port **5173** (onglet *Ports* → icône 🌐). Le jeu s'ouvre dans le navigateur.
 
 ## Commandes
 
 ```bash
 npm install          # installe les dépendances
+npm run dev          # lance le jeu sur http://localhost:5173
+npm run build        # version optimisée dans dist/
 npm test             # lance les tests (Vitest)
 npm run typecheck    # vérifie les types
 npm run gen          # génère levels/campaign.json et levels/daily.json (~4 min)
@@ -35,6 +39,8 @@ npm run gen -- --size 6 --count 50 --seed 123   # lot libre dans levels/batch.js
 
 ```
 src/core/        moteur partagé (jeu + outils) : grille, solveur, générateur, difficulté
+src/game/        le jeu : règles, rendu canvas, écran, sauvegarde
+index.html       page du jeu (Vite)
 tools/levelgen/  CLI de génération et de validation des niveaux
 levels/          niveaux générés (JSON)
 tests/           tests Vitest
@@ -46,6 +52,11 @@ docs/            cahier des charges et plan de lancement
 | Jalon | Contenu | État |
 |---|---|---|
 | M0 | Outil de contenu : générateur + solveur, 200 + 730 niveaux validés | ✅ fait |
-| M1 | Boucle de jeu en gris | à faire |
+| M1 | Boucle de jeu jouable dans le navigateur | ✅ fait |
 | M2 | Juice, contenu, défi du jour, partage, EN/FR, stubs pub/analytics | à faire |
 | M3 | Builds web + Android | à faire |
+
+## Astuces de test
+
+- `?level=95` ouvre directement le niveau 95, `?all=1` débloque tous les niveaux.
+- `?mode=daily` ouvre le défi du jour (avant le 1er décembre 2026 : aperçu du premier défi).

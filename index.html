@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#F6F1E7" />
+    <title>Escargot Express</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🐌%3C/text%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="./src/game/style.css" />
+  </head>
+  <body>
+    <main class="app">
+      <header class="top">
+        <h1>🐌 Escargot Express</h1>
+        <div class="tabs" role="tablist">
+          <button id="tab-campaign" class="tab active" role="tab" aria-selected="true">Campagne</button>
+          <button id="tab-daily" class="tab" role="tab" aria-selected="false">Défi du jour</button>
+        </div>
+      </header>
+
+      <section class="bar">
+        <button id="prev" class="icon" aria-label="Niveau précédent">‹</button>
+        <div class="title">
+          <div id="level-label">Niveau 1</div>
+          <div id="level-meta" class="meta"></div>
+        </div>
+        <button id="next" class="icon" aria-label="Niveau suivant">›</button>
+      </section>
+
+      <div class="status">
+        <span id="timer" class="timer">0:00</span>
+        <span id="progress" class="progress">0 %</span>
+      </div>
+
+      <div class="board-wrap">
+        <canvas id="board" aria-label="Plateau de jeu"></canvas>
+
+        <div id="win" class="overlay hidden" role="dialog" aria-live="polite">
+          <div class="card">
+            <div class="big">🐌✨</div>
+            <h2 id="win-title">Bravo !</h2>
+            <p id="win-text"></p>
+            <button id="win-next" class="primary">Niveau suivant</button>
+          </div>
+        </div>
+      </div>
+
+      <p id="message" class="message" aria-live="polite"></p>
+
+      <section class="controls">
+        <button id="reset" class="secondary">↺ Recommencer</button>
+        <button id="hint" class="secondary">💡 Indice</button>
+      </section>
+    </main>
+    <script type="module" src="./src/game/main.ts"></script>
+  </body>
+</html>
