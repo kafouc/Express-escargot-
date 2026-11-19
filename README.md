@@ -9,6 +9,10 @@ Puzzle de chemin quotidien : guide un escargot à travers le jardin, passe par l
 
 - Node.js **22.18 ou plus récent** (exécute directement le TypeScript)
 
+### Avec GitHub Codespaces
+
+Bouton **Code → Codespaces → Create codespace**. Node 22 et les dépendances s'installent automatiquement (`.devcontainer/`), il ne reste qu'à lancer les commandes ci-dessous dans le terminal.
+
 ## Commandes
 
 ```bash
