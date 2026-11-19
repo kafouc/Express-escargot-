@@ -33,10 +33,19 @@ export interface RenderState {
   facing: 1 | -1;
   tilt: number;
   lastTime: number;
+  /** Dernier indice du chemin atteint visuellement par le personnage. */
+  reached: number;
+  /** Feuilles croquées : case → horodatage du « pop ». */
+  pops: Map<number, number>;
+  /** Appelé quand le personnage arrive visuellement sur une case (sons synchronisés avec l'animation). */
+  onArrive?: (cell: number, isWaypoint: boolean) => void;
 }
 
 export function createRenderState(character: Character, leaf: LeafColor): RenderState {
-  return { character, leaf, shakeAt: -1e9, winAt: 0, display: -1, distance: 0, moving: 0, facing: 1, tilt: 0, lastTime: 0 };
+  return {
+    character, leaf, shakeAt: -1e9, winAt: 0, display: -1, distance: 0, moving: 0, facing: 1, tilt: 0, lastTime: 0,
+    reached: -1, pops: new Map(),
+  };
 }
 
 /** Remet le personnage au départ (nouveau niveau ou « Recommencer »). */
@@ -46,6 +55,8 @@ export function resetMotion(state: RenderState): void {
   state.tilt = 0;
   state.facing = 1;
   state.winAt = 0;
+  state.reached = -1;
+  state.pops.clear();
 }
 
 export function computeLayout(cssSize: number, gridSize: number): Layout {
@@ -80,12 +91,13 @@ function pointAt(points: [number, number][], d: number): [number, number] {
 const clamp01 = (x: number) => Math.min(Math.max(x, 0), 1);
 
 /** Fait glisser la position affichée vers la tête réelle du chemin, et met à jour l'orientation. */
-function updateMotion(state: RenderState, points: [number, number][], now: number): void {
+function updateMotion(state: RenderState, game: Game, points: [number, number][], now: number): void {
   const dt = state.lastTime ? Math.min(now - state.lastTime, 50) / 1000 : 0;
   state.lastTime = now;
   const target = points.length - 1;
   if (target < 0) {
     state.display = -1;
+    state.reached = -1;
     return;
   }
   if (state.display < 0) state.display = 0;
@@ -97,6 +109,17 @@ function updateMotion(state: RenderState, points: [number, number][], now: numbe
   state.display += move;
   state.distance += Math.abs(move);
   state.moving += ((Math.abs(gap) > 0.02 ? 1 : 0) - state.moving) * Math.min(1, dt * 10);
+
+  // Arrivées sur de nouvelles cases : « pop » des feuilles et sons synchronisés.
+  const arrived = Math.min(Math.floor(state.display + 0.35), target);
+  if (arrived < state.reached) state.reached = arrived;
+  while (state.reached < arrived) {
+    state.reached++;
+    const cell = game.path[state.reached] as number;
+    const isWaypoint = (game.puzzle.waypointAt[cell] ?? 0) !== 0;
+    if (isWaypoint) state.pops.set(cell, now);
+    state.onArrive?.(cell, isWaypoint);
+  }
 
   // Direction du segment parcouru.
   if (points.length >= 2) {
@@ -124,7 +147,7 @@ export function render(ctx: CanvasRenderingContext2D, game: Game, layout: Layout
   const { size } = game.puzzle;
   const { cell, pad } = layout;
   const points = game.path.map((c) => center(layout, size, c));
-  updateMotion(state, points, now);
+  updateMotion(state, game, points, now);
   ctx.clearRect(0, 0, layout.size, layout.size);
 
   // Plateau et cases.
@@ -222,11 +245,19 @@ export function render(ctx: CanvasRenderingContext2D, game: Game, layout: Layout
       ctx.fill();
       ctx.globalAlpha = 1;
     }
+    // Feuille croquée : 1 → 1,35 → 1 en 280 ms.
+    const popAt = state.pops.get(wc);
+    if (popAt !== undefined && now - popAt < 280) {
+      const k = 1 + 0.35 * Math.sin(Math.PI * ((now - popAt) / 280));
+      ctx.scale(k, k);
+    }
     // Petite oscillation de la feuille, comme dans le vent.
     const sway = -0.5 + Math.sin(now / 900 + wc) * 0.06;
     drawLeaf(ctx, radius, done ? leaf.done : leaf.fill, leaf.vein, String(n), sway);
     ctx.restore();
   });
+
+  drawConfetti(ctx, layout, state, now);
 
   // Personnage.
   if (state.display >= 0 && points.length > 0) {
@@ -245,6 +276,35 @@ export function render(ctx: CanvasRenderingContext2D, game: Game, layout: Layout
       joy: joyT > 0 && joyT < 1 ? joyT : 0,
       shake: shakeT > 0 && shakeT < 1 ? shakeT : 0,
     });
+    ctx.restore();
+  }
+}
+
+/** Nombre pseudo-aléatoire stable dans [0, 1) pour l'indice i (pas d'état à conserver entre les images). */
+function noise(i: number): number {
+  const x = Math.sin(i * 12.9898 + 78.233) * 43758.5453;
+  return x - Math.floor(x);
+}
+
+/** Victoire : une pluie de petites feuilles tombe en virevoltant pendant ~2,5 s. */
+function drawConfetti(ctx: CanvasRenderingContext2D, layout: Layout, state: RenderState, now: number): void {
+  if (state.winAt <= 0) return;
+  const elapsed = now - state.winAt;
+  if (elapsed > 2800) return;
+  const { cell, size } = layout;
+  const colors = [state.leaf.fill, state.leaf.done, state.character.trail.fill];
+  for (let i = 0; i < 28; i++) {
+    const delay = noise(i) * 500;
+    const t = (elapsed - delay) / 1000;
+    if (t < 0) continue;
+    const x = noise(i + 100) * size + Math.sin(t * 2.6 + i) * cell * 0.35;
+    const y = -cell * 0.4 + t * size * 0.3 + t * t * size * 0.16;
+    if (y > size + cell) continue;
+    ctx.save();
+    ctx.globalAlpha = t > 1.8 ? Math.max(0, 1 - (t - 1.8) / 0.6) : 1;
+    ctx.translate(x, y);
+    ctx.rotate(t * (noise(i + 200) - 0.5) * 9);
+    drawLeaf(ctx, cell * (0.12 + noise(i + 300) * 0.08), colors[i % colors.length] as string, state.leaf.vein, '', 0);
     ctx.restore();
   }
 }

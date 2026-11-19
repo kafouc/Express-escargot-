@@ -39,7 +39,9 @@ npm run gen -- --size 6 --count 50 --seed 123   # lot libre dans levels/batch.js
 
 ```
 src/core/        moteur partagé (jeu + outils) : grille, solveur, générateur, difficulté
-src/game/        le jeu : règles, rendu canvas, écran, sauvegarde
+src/game/        le jeu : règles, rendu canvas, animaux, sons, textes FR/EN, défi du jour, écran, sauvegarde
+src/monetization/ pubs (interface + version simulée, règles des interstitiels)
+src/analytics/   événements analytics (interface + version simulée)
 index.html       page du jeu (Vite)
 tools/levelgen/  CLI de génération et de validation des niveaux
 levels/          niveaux générés (JSON)
@@ -53,7 +55,7 @@ docs/            cahier des charges et plan de lancement
 |---|---|---|
 | M0 | Outil de contenu : générateur + solveur, 200 + 730 niveaux validés | ✅ fait |
 | M1 | Boucle de jeu jouable dans le navigateur | ✅ fait |
-| M2 | Juice, contenu, défi du jour, partage, EN/FR, stubs pub/analytics | à faire |
+| M2 | Effets, sons et vibrations, défi du jour et série, partage, FR/EN, pubs et analytics simulées | ✅ fait |
 | M3 | Builds web + Android | à faire |
 
 ## Personnalisation
@@ -64,3 +66,6 @@ Bouton palette en haut : choix de l'animal et de la couleur des feuilles. Les 7 
 
 - `?level=95` ouvre directement le niveau 95, `?all=1` débloque tous les niveaux et tous les animaux.
 - `?mode=daily` ouvre le défi du jour (avant le 1er décembre 2026 : aperçu du premier défi).
+- `?fast=1` propose « Passer ce niveau » au bout de 5 s au lieu de 3 min.
+- Dans la console du navigateur : `__analytics.events` liste tous les événements envoyés.
+- Les pubs sont simulées : un message « Publicité simulée » s'affiche à la place.

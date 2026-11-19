@@ -13,38 +13,42 @@
       <header class="top">
         <div class="brand">
           <canvas id="logo" class="logo" aria-hidden="true"></canvas>
-          <h1>Escargot Express</h1>
-          <button id="settings-open" class="icon small" aria-label="Personnaliser"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.2 0 1.8-.8 1.8-1.7 0-.5-.2-.9-.5-1.2-.3-.3-.5-.7-.5-1.2 0-1 .8-1.7 1.8-1.7H17a4 4 0 0 0 4-4c0-4.6-4-8.2-9-8.2Z"/><circle cx="7.5" cy="11" r="1.2" fill="currentColor"/><circle cx="10" cy="7.2" r="1.2" fill="currentColor"/><circle cx="14.5" cy="7.2" r="1.2" fill="currentColor"/></svg></button>
+          <h1 id="game-name">Escargot Express</h1>
+          <button id="settings-open" class="icon small" data-i18n-aria="aria.settings"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.2 0 1.8-.8 1.8-1.7 0-.5-.2-.9-.5-1.2-.3-.3-.5-.7-.5-1.2 0-1 .8-1.7 1.8-1.7H17a4 4 0 0 0 4-4c0-4.6-4-8.2-9-8.2Z"/><circle cx="7.5" cy="11" r="1.2" fill="currentColor"/><circle cx="10" cy="7.2" r="1.2" fill="currentColor"/><circle cx="14.5" cy="7.2" r="1.2" fill="currentColor"/></svg></button>
         </div>
         <div class="tabs" role="tablist">
-          <button id="tab-campaign" class="tab active" role="tab" aria-selected="true">Campagne</button>
-          <button id="tab-daily" class="tab" role="tab" aria-selected="false">Défi du jour</button>
+          <button id="tab-campaign" class="tab active" role="tab" aria-selected="true" data-i18n="tab.campaign"></button>
+          <button id="tab-daily" class="tab" role="tab" aria-selected="false" data-i18n="tab.daily"></button>
         </div>
       </header>
 
       <section class="bar">
-        <button id="prev" class="icon" aria-label="Niveau précédent">‹</button>
+        <button id="prev" class="icon" data-i18n-aria="aria.prev">‹</button>
         <div class="title">
-          <div id="level-label">Niveau 1</div>
+          <div id="level-label"></div>
           <div id="level-meta" class="meta"></div>
         </div>
-        <button id="next" class="icon" aria-label="Niveau suivant">›</button>
+        <button id="next" class="icon" data-i18n-aria="aria.next">›</button>
       </section>
 
       <div class="status">
-        <span class="timer"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></svg><span id="timer">0:00</span></span>
+        <span id="timer-wrap" class="timer"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></svg><span id="timer">0:00</span></span>
         <span id="progress" class="progress">0 %</span>
       </div>
 
       <div class="board-wrap">
-        <canvas id="board" aria-label="Plateau de jeu"></canvas>
+        <canvas id="board" data-i18n-aria="aria.board"></canvas>
 
         <div id="win" class="overlay hidden" role="dialog" aria-live="polite">
           <div class="card">
             <canvas id="win-art" class="win-art" aria-hidden="true"></canvas>
-            <h2 id="win-title">Bravo !</h2>
+            <h2 id="win-title"></h2>
             <p id="win-text"></p>
-            <button id="win-next" class="primary">Niveau suivant</button>
+            <p id="win-streak" class="streak hidden"></p>
+            <div class="card-actions">
+              <button id="win-next" class="primary"></button>
+              <button id="win-share" class="secondary"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 8l5-5 5 5"/><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg><span data-i18n="btn.share"></span></button>
+            </div>
           </div>
         </div>
       </div>
@@ -52,22 +56,38 @@
       <p id="message" class="message" aria-live="polite"></p>
 
       <section class="controls">
-        <button id="reset" class="secondary"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg><span>Recommencer</span></button>
-        <button id="hint" class="secondary"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.3 1.1 2.2h5c0-.9.4-1.6 1.1-2.2A6 6 0 0 0 12 3Z"/></svg><span>Indice</span></button>
+        <button id="reset" class="secondary"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg><span data-i18n="btn.reset"></span></button>
+        <button id="hint" class="secondary"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.3 1.1 2.2h5c0-.9.4-1.6 1.1-2.2A6 6 0 0 0 12 3Z"/></svg><span id="hint-label"></span></button>
       </section>
+      <button id="skip" class="link hidden" data-i18n="btn.skip"></button>
     </main>
+
+    <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
 
     <div id="settings" class="sheet-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="settings-title">
       <div class="sheet">
         <div class="sheet-head">
-          <h2 id="settings-title">Personnaliser</h2>
-          <button id="settings-close" class="icon small" aria-label="Fermer"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+          <h2 id="settings-title" data-i18n="settings.title"></h2>
+          <button id="settings-close" class="icon small" data-i18n-aria="aria.close"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
         </div>
         <canvas id="preview" class="preview" aria-hidden="true"></canvas>
-        <h3>Ton animal</h3>
+        <h3 data-i18n="settings.animal"></h3>
         <div id="character-list" class="choices"></div>
-        <h3>Couleur des feuilles</h3>
+        <h3 data-i18n="settings.leaves"></h3>
         <div id="leaf-list" class="swatches"></div>
+        <h3 data-i18n="settings.options"></h3>
+        <div class="options">
+          <label class="option"><span data-i18n="opt.sound"></span><input id="opt-sound" type="checkbox" class="switch" /></label>
+          <label class="option"><span data-i18n="opt.vibration"></span><input id="opt-vibration" type="checkbox" class="switch" /></label>
+          <label class="option"><span data-i18n="opt.timer"></span><input id="opt-timer" type="checkbox" class="switch" /></label>
+          <div class="option">
+            <span data-i18n="opt.language"></span>
+            <div class="segmented" role="group">
+              <button id="lang-fr" lang="fr">Français</button>
+              <button id="lang-en" lang="en">English</button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <script type="module" src="./src/game/main.ts"></script>

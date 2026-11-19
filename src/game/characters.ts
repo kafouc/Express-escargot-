@@ -185,6 +185,7 @@ export function drawLeaf(ctx: CanvasRenderingContext2D, size: number, color: str
   ctx.stroke();
   ctx.restore();
 
+  if (!label) return;
   ctx.fillStyle = '#ffffff';
   ctx.strokeStyle = vein;
   ctx.lineWidth = Math.max(2, size * 0.12);
