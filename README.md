@@ -58,7 +58,7 @@ docs/            cahier des charges et plan de lancement
 
 ## Personnalisation
 
-Bouton 🎨 en haut : choix de l'animal (escargot animé, chenille, tortue, coccinelle, hérisson, lapin, poussin — débloqués en avançant dans la campagne) et de la couleur des feuilles.
+Bouton palette en haut : choix de l'animal et de la couleur des feuilles. Les 7 animaux (escargot, chenille, tortue, coccinelle, hérisson, lapin, poussin) sont dessinés en code dans `src/game/animals.ts` et animés partie par partie ; ils se débloquent en avançant dans la campagne.
 
 ## Astuces de test
 

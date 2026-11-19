@@ -82,7 +82,7 @@ Direction artistique : couleurs douces (vert sauge, crème, touches corail), for
 
 ## 4 bis. Personnalisation (ajout du 19/11/2026)
 
-- **Animaux** (débloqués par la progression en campagne) : Escargot (dessiné en vectoriel, niv. 1), Chenille (10), Tortue (25), Coccinelle (50), Hérisson (80), Lapin (120), Poussin (160). Chaque animal a sa façon de bouger (glisser, se dandiner, sautiller) et sa traînée.
+- **Animaux** (débloqués par la progression en campagne), tous dessinés en vectoriel et animés partie par partie (`src/game/animals.ts`), sans emoji : Escargot (niv. 1), Chenille (10), Tortue (25), Coccinelle (50), Hérisson (80), Lapin (120), Poussin (160). Chaque animal a sa façon de bouger (glisser, se dandiner, sautiller) et sa traînée.
 - **Couleur des feuilles** : 7 teintes (vert, corail, bleu, violet, or, rose, nuit), libres dès le départ.
 - Choix sauvegardés localement ; menu 🎨 avec aperçu animé.
 - Piste de monétisation future : animaux supplémentaires en achat intégré ou débloqués par une pub récompensée.

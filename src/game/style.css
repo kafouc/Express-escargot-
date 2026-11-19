@@ -213,8 +213,16 @@ canvas {
   margin: 0 0 18px;
 }
 
-.big {
-  font-size: 2.6rem;
+.win-art {
+  display: block;
+  width: 110px;
+  height: 110px;
+  margin: -10px auto 0;
+}
+
+.logo {
+  width: 40px;
+  height: 40px;
 }
 
 @keyframes fade {
@@ -299,8 +307,9 @@ canvas {
   border-color: var(--leaf);
 }
 
-.choice .emoji {
-  font-size: 1.8rem;
+.choice .thumb {
+  width: 64px;
+  height: 64px;
 }
 
 .choice .name {
@@ -331,4 +340,30 @@ canvas {
 .swatch[aria-pressed='true'] {
   outline: 3px solid var(--ink);
   outline-offset: 1px;
+}
+
+/* ---------- Icônes ---------- */
+
+.ico {
+  width: 1.2em;
+  height: 1.2em;
+  flex: none;
+}
+
+.secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.icon {
+  display: inline-grid;
+  place-items: center;
+}
+
+.timer {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }

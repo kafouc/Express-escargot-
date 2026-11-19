@@ -3,7 +3,7 @@ import type { Level } from '../core/types.ts';
 import { cellRC } from '../core/grid.ts';
 import { applyHint, blockReason, createGame, head, isWon, moveTo, nextWaypoint, progress, reset, truncateAt, type Game } from './rules.ts';
 import { cellAt, computeLayout, createRenderState, render, resetMotion, type Layout } from './render.ts';
-import { CHARACTERS, LEAF_COLORS, characterById, isUnlocked, leafColorById } from './characters.ts';
+import { CHARACTERS, LEAF_COLORS, characterById, drawCharacter, isUnlocked, leafColorById, type Character } from './characters.ts';
 import { load, save } from './storage.ts';
 
 type Mode = 'campaign' | 'daily';
@@ -33,6 +33,8 @@ const ui = {
   characterList: $('character-list'),
   leafList: $('leaf-list'),
   previewCanvas: $<HTMLCanvasElement>('preview'),
+  logo: $<HTMLCanvasElement>('logo'),
+  winArt: $<HTMLCanvasElement>('win-art'),
 };
 
 const params = new URLSearchParams(location.search);
@@ -290,6 +292,49 @@ ui.winNext.addEventListener('click', () => {
 
 const isCharacterUnlocked = (id: string) => unlockAll || isUnlocked(characterById(id), saveData.unlocked);
 
+/** Prépare un canvas net (écran Retina) et renvoie son contexte et sa taille CSS. */
+function prepareCanvas(canvas: HTMLCanvasElement, fallback: number): [CanvasRenderingContext2D, number] {
+  const css = canvas.clientWidth || fallback;
+  const dpr = Math.min(window.devicePixelRatio || 1, 3);
+  const px = Math.round(css * dpr);
+  if (canvas.width !== px) {
+    canvas.width = px;
+    canvas.height = px;
+  }
+  const context = canvas.getContext('2d') as CanvasRenderingContext2D;
+  context.setTransform(dpr, 0, 0, dpr, 0, 0);
+  context.clearRect(0, 0, css, css);
+  return [context, css];
+}
+
+/** Dessine un animal centré dans un canvas carré ; en silhouette s'il est verrouillé. */
+function drawPortrait(
+  canvas: HTMLCanvasElement,
+  character: Character,
+  options: { locked?: boolean; time?: number; joy?: number; moving?: number; stride?: number; scale?: number; lift?: number } = {},
+): void {
+  const [c, css] = prepareCanvas(canvas, 64);
+  c.save();
+  c.translate(css / 2, css / 2 + css * (options.lift ?? 0.04));
+  drawCharacter(c, character, {
+    cell: css * (options.scale ?? 1.05),
+    time: options.time ?? 1000,
+    moving: options.moving ?? 0,
+    stride: options.stride ?? 0,
+    facing: 1,
+    tilt: 0,
+    joy: options.joy ?? 0,
+    shake: 0,
+  });
+  c.restore();
+  if (options.locked) {
+    c.globalCompositeOperation = 'source-atop';
+    c.fillStyle = 'rgba(90,80,68,0.92)';
+    c.fillRect(0, 0, css, css);
+    c.globalCompositeOperation = 'source-over';
+  }
+}
+
 function buildSettings(): void {
   ui.characterList.replaceChildren(
     ...CHARACTERS.map((character) => {
@@ -299,8 +344,16 @@ function buildSettings(): void {
       button.dataset.id = character.id;
       button.disabled = !unlocked;
       button.setAttribute('aria-pressed', String(character.id === renderState.character.id));
-      button.innerHTML = `<span class="emoji">${unlocked ? character.emoji : '🔒'}</span><span class="name">${character.name}</span>` +
-        `<span class="sub">${unlocked ? character.trailName : `niveau ${character.unlockLevel}`}</span>`;
+      const thumb = document.createElement('canvas');
+      thumb.className = 'thumb';
+      const name = document.createElement('span');
+      name.className = 'name';
+      name.textContent = unlocked ? character.name : '???';
+      const sub = document.createElement('span');
+      sub.className = 'sub';
+      sub.textContent = unlocked ? character.trailName : `Débloqué au niveau ${character.unlockLevel}`;
+      button.append(thumb, name, sub);
+      requestAnimationFrame(() => drawPortrait(thumb, character, { locked: !unlocked }));
       button.addEventListener('click', () => {
         renderState.character = character;
         saveData.character = character.id;
@@ -389,9 +442,16 @@ function frame(now: number): void {
   if (game) {
     render(ctx, game, layout, renderState, now);
     const seconds = finishedSeconds ?? (startedAt ? (now - startedAt) / 1000 : 0);
-    ui.timer.textContent = `⏱ ${formatTime(seconds)}`;
+    ui.timer.textContent = formatTime(seconds);
   }
   renderPreview(now);
+  // Logo : l'escargot qui respire dans l'en-tête.
+  drawPortrait(ui.logo, characterById('escargot'), { time: now });
+  // Écran de victoire : l'animal choisi fait des petits bonds de joie.
+  if (!ui.win.classList.contains('hidden')) {
+    const loop = (now % 1400) / 700;
+    drawPortrait(ui.winArt, renderState.character, { time: now, joy: loop < 1 ? loop : 0, scale: 0.75, lift: 0.2 });
+  }
   requestAnimationFrame(frame);
 }
 

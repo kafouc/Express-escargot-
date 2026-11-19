@@ -1,8 +1,8 @@
 /**
  * Personnages jouables et couleurs de feuilles.
- * L'escargot est dessiné en vectoriel (animé partie par partie) ; les autres animaux
- * utilisent l'emoji du système, animé selon leur façon de se déplacer.
+ * Tous les animaux sont dessinés en vectoriel (cf. animals.ts) et animés partie par partie.
  */
+import { ANIMAL_DRAWERS } from './animals.ts';
 
 /** Façon de se déplacer : glisser (étirement), sautiller, se dandiner. */
 export type Motion = 'slide' | 'hop' | 'waddle';
@@ -16,51 +16,47 @@ export interface TrailStyle {
 export interface Character {
   id: string;
   name: string;
-  /** Emoji affiché dans le menu (et en jeu, sauf pour l'escargot dessiné). */
-  emoji: string;
   /** Niveau de campagne à débloquer pour l'utiliser. */
   unlockLevel: number;
   motion: Motion;
   trail: TrailStyle;
   /** Nom de la traînée affiché dans le menu. */
   trailName: string;
-  /** Dessiné en vectoriel plutôt qu'avec l'emoji. */
-  drawn?: boolean;
 }
 
 export const CHARACTERS: Character[] = [
   {
-    id: 'escargot', name: 'Escargot', emoji: '🐌', unlockLevel: 1, motion: 'slide', drawn: true,
+    id: 'escargot', name: 'Escargot', unlockLevel: 1, motion: 'slide',
     trailName: 'bave brillante',
     trail: { edge: '#6f9a6d', fill: '#8db38b', shine: 'rgba(255,255,255,0.45)' },
   },
   {
-    id: 'chenille', name: 'Chenille', emoji: '🐛', unlockLevel: 10, motion: 'slide',
+    id: 'chenille', name: 'Chenille', unlockLevel: 10, motion: 'slide',
     trailName: 'feuilles grignotées',
     trail: { edge: '#7aa63a', fill: '#a6cf5f', shine: 'rgba(255,255,220,0.45)' },
   },
   {
-    id: 'tortue', name: 'Tortue', emoji: '🐢', unlockLevel: 25, motion: 'waddle',
+    id: 'tortue', name: 'Tortue', unlockLevel: 25, motion: 'waddle',
     trailName: 'sable',
     trail: { edge: '#c9a66b', fill: '#e6cf9c', shine: 'rgba(255,255,255,0.4)' },
   },
   {
-    id: 'coccinelle', name: 'Coccinelle', emoji: '🐞', unlockLevel: 50, motion: 'waddle',
+    id: 'coccinelle', name: 'Coccinelle', unlockLevel: 50, motion: 'waddle',
     trailName: 'pétales',
     trail: { edge: '#e08a8a', fill: '#f4b9b2', shine: 'rgba(255,255,255,0.5)' },
   },
   {
-    id: 'herisson', name: 'Hérisson', emoji: '🦔', unlockLevel: 80, motion: 'waddle',
+    id: 'herisson', name: 'Hérisson', unlockLevel: 80, motion: 'waddle',
     trailName: 'feuilles mortes',
     trail: { edge: '#b07a4a', fill: '#d9a877', shine: 'rgba(255,240,210,0.45)' },
   },
   {
-    id: 'lapin', name: 'Lapin', emoji: '🐇', unlockLevel: 120, motion: 'hop',
+    id: 'lapin', name: 'Lapin', unlockLevel: 120, motion: 'hop',
     trailName: 'trèfles',
     trail: { edge: '#8fb7c9', fill: '#bfdbe6', shine: 'rgba(255,255,255,0.5)' },
   },
   {
-    id: 'poussin', name: 'Poussin', emoji: '🐥', unlockLevel: 160, motion: 'hop',
+    id: 'poussin', name: 'Poussin', unlockLevel: 160, motion: 'hop',
     trailName: 'plumes',
     trail: { edge: '#e3bd3d', fill: '#f6dd84', shine: 'rgba(255,255,255,0.5)' },
   },
@@ -161,113 +157,8 @@ export function drawCharacter(ctx: CanvasRenderingContext2D, character: Characte
   ctx.rotate(wobble + pose.tilt * pose.facing);
   ctx.scale(pose.facing * squash * breathe, (1 / squash) * breathe);
 
-  if (character.drawn) drawSnail(ctx, pose);
-  else drawEmoji(ctx, character.emoji, cell);
-  ctx.restore();
-}
-
-function drawEmoji(ctx: CanvasRenderingContext2D, emoji: string, cell: number): void {
-  // La plupart des emojis d'animaux regardent vers la gauche : on les retourne pour qu'ils regardent vers +x.
-  ctx.scale(-1, 1);
-  // Les emojis couleur héritent de l'opacité de fillStyle : on repart d'une couleur opaque.
-  ctx.fillStyle = '#000000';
-  ctx.font = `${Math.round(cell * 0.62)}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(emoji, 0, -cell * 0.04);
-}
-
-/** Escargot vectoriel, tourné vers +x : corps qui ondule, coquille qui roule, antennes qui oscillent. */
-function drawSnail(ctx: CanvasRenderingContext2D, pose: Pose): void {
-  const u = pose.cell;
-  const t = pose.time;
-  const wave = Math.sin(pose.stride * Math.PI * 2);
-
-  // Corps : une limace arrondie, plus longue quand il avance.
-  const front = 0.34 + 0.04 * pose.moving;
-  ctx.fillStyle = '#efcfa3';
-  ctx.strokeStyle = '#c99e6c';
-  ctx.lineWidth = u * 0.025;
-  ctx.beginPath();
-  ctx.moveTo(-0.36 * u, 0.2 * u);
-  ctx.quadraticCurveTo(-0.38 * u, 0.1 * u, -0.22 * u, 0.1 * u);
-  ctx.lineTo(0.16 * u, 0.1 * u + wave * 0.01 * u);
-  ctx.quadraticCurveTo(front * u, 0.06 * u, front * u, -0.04 * u);
-  ctx.quadraticCurveTo((front + 0.03) * u, 0.2 * u, 0.2 * u, 0.2 * u);
-  ctx.closePath();
-  ctx.fill();
-  ctx.stroke();
-
-  // Antennes qui oscillent, plus vite en mouvement.
-  const sway = Math.sin(t / (pose.moving > 0.2 ? 90 : 260)) * 0.06;
-  const stalks: [number, number, number][] = [
-    [0.25, -0.17, sway],
-    [0.33, -0.13, -sway * 0.8],
-  ];
-  for (const [x, y, s] of stalks) {
-    const tipX = (x + s) * u;
-    const tipY = y * u;
-    ctx.strokeStyle = '#c99e6c';
-    ctx.lineWidth = u * 0.03;
-    ctx.lineCap = 'round';
-    ctx.beginPath();
-    ctx.moveTo(0.24 * u, 0.0);
-    ctx.quadraticCurveTo((x - 0.02) * u, (y + 0.08) * u, tipX, tipY);
-    ctx.stroke();
-    ctx.fillStyle = '#ffffff';
-    ctx.beginPath();
-    ctx.arc(tipX, tipY, u * 0.04, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#2d2620';
-    ctx.beginPath();
-    ctx.arc(tipX + u * 0.012, tipY, u * 0.02, 0, Math.PI * 2);
-    ctx.fill();
-  }
-
-  // Joue rosée et sourire.
-  ctx.fillStyle = 'rgba(232,119,91,0.35)';
-  ctx.beginPath();
-  ctx.arc(0.27 * u, 0.06 * u, u * 0.03, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.strokeStyle = '#8b6a45';
-  ctx.lineWidth = u * 0.018;
-  ctx.beginPath();
-  ctx.arc(0.29 * u, 0.03 * u, u * 0.035, 0.2, Math.PI - 0.6);
-  ctx.stroke();
-
-  // Coquille qui roule légèrement en avançant.
-  const bob = Math.sin(pose.stride * Math.PI * 2 + 1) * 0.015 * u * pose.moving + Math.sin(t / 500) * 0.006 * u;
-  ctx.save();
-  ctx.translate(-0.08 * u, -0.06 * u + bob);
-  ctx.rotate(pose.stride * 0.6 * pose.moving);
-  const r = 0.21 * u;
-  const grad = ctx.createRadialGradient(-r * 0.3, -r * 0.3, r * 0.1, 0, 0, r);
-  grad.addColorStop(0, '#f0a274');
-  grad.addColorStop(1, '#c4673f');
-  ctx.fillStyle = grad;
-  ctx.strokeStyle = '#8e4a2e';
-  ctx.lineWidth = u * 0.025;
-  ctx.beginPath();
-  ctx.arc(0, 0, r, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.stroke();
-  // Spirale.
-  ctx.strokeStyle = '#9b5534';
-  ctx.lineWidth = u * 0.022;
-  ctx.beginPath();
-  for (let a = 0; a <= Math.PI * 4.2; a += 0.15) {
-    const rr = r * 0.82 * (1 - a / (Math.PI * 4.6));
-    const x = Math.cos(a) * rr;
-    const y = Math.sin(a) * rr;
-    if (a === 0) ctx.moveTo(x, y);
-    else ctx.lineTo(x, y);
-  }
-  ctx.stroke();
-  // Reflet.
-  ctx.fillStyle = 'rgba(255,255,255,0.35)';
-  ctx.beginPath();
-  ctx.ellipse(-r * 0.35, -r * 0.45, r * 0.25, r * 0.12, -0.6, 0, Math.PI * 2);
-  ctx.fill();
+  const draw = ANIMAL_DRAWERS[character.id] ?? ANIMAL_DRAWERS.escargot;
+  draw?.(ctx, pose);
   ctx.restore();
 }
 
