@@ -1,0 +1,22 @@
+{
+  "name": "escargot-express",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Puzzle de chemin quotidien avec un escargot",
+  "type": "module",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "gen": "node tools/levelgen/cli.ts",
+    "show": "node tools/levelgen/show.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "typescript": "^7.0.2",
+    "vitest": "^5.1.1"
+  }
+}

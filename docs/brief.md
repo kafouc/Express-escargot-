@@ -105,7 +105,9 @@ Dossier `tools/levelgen/`, exécutable en CLI Node (`npm run gen -- --size 6 --c
 | 4–30 | 5×5 / 6×6 | 5–8 | 0–2 |
 | 31–80 | 6×6 | 4–7 | 0–4 |
 | 81–140 | 7×7 | 4–8 | 0–6 |
-| 141–200 | 8×8 | 4–9 | 0–8 |
+| 141–200 | 8×8 | 6–12 | 0–10 |
+
+> Ajusté pendant M0 : avec 4–9 feuilles et 0–8 murs, un 8×8 à solution unique demandait en moyenne 3,6 s (max 14 s) de génération. Avec 6–12 feuilles et 0–10 murs : ~0,3 s en moyenne, < 1 s au maximum.
 Dans chaque tranche, trier par difficulté croissante.
 
 ### 5.5 Défis quotidiens

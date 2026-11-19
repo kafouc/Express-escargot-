@@ -15,7 +15,9 @@ Puzzle de chemin quotidien : guide un escargot à travers le jardin, passe par l
 npm install          # installe les dépendances
 npm test             # lance les tests (Vitest)
 npm run typecheck    # vérifie les types
-npm run gen          # génère levels/campaign.json et levels/daily.json
+npm run gen          # génère levels/campaign.json et levels/daily.json (~4 min)
+npm run show -- c-0042               # affiche un niveau dans le terminal
+npm run show -- 2026-12-06 --solution
 ```
 
 ### Options du générateur
@@ -39,7 +41,7 @@ docs/            cahier des charges et plan de lancement
 
 | Jalon | Contenu | État |
 |---|---|---|
-| M0 | Outil de contenu : générateur + solveur, 200 + 730 niveaux validés | en cours |
+| M0 | Outil de contenu : générateur + solveur, 200 + 730 niveaux validés | ✅ fait |
 | M1 | Boucle de jeu en gris | à faire |
 | M2 | Juice, contenu, défi du jour, partage, EN/FR, stubs pub/analytics | à faire |
 | M3 | Builds web + Android | à faire |
